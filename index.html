@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notion Widgets Hub</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f7f6f3;
+      color: #37352f;
+      display: flex;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: #787774;
+    }
+
+    .widget-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .widget-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      padding: 16px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid rgba(227, 226, 224, 0.8);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .widget-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .widget-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .widget-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .widget-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #212529;
+    }
+
+    .widget-desc {
+      font-size: 12px;
+      color: #868e96;
+      margin-top: 2px;
+    }
+
+    .arrow {
+      color: #adb5bd;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>📦 Notion Widgets</h1>
+      <p>노션 임베드용 커스텀 위젯 모음</p>
+    </div>
+
+    <div class="widget-list">
+      <a href="./pomodoro-widget.html" class="widget-card">
+        <div class="widget-info">
+          <span class="widget-icon">🍅</span>
+          <div>
+            <div class="widget-title">뽀모도로 타이머 (Pomodoro)</div>
+            <div class="widget-desc">25/5 루프 & 옵시디언 스타일 로그 복사</div>
+          </div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+
+      </div>
+  </div>
+
+</body>
+</html>
