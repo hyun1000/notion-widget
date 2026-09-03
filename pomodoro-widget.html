@@ -15,20 +15,21 @@
     body {
       background: transparent;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 12px;
+      padding: 16px;
     }
 
     .timer-card {
       background: #ffffff;
       border-radius: 12px;
-      padding: 20px 24px;
+      padding: 24px 30px;
       width: 100%;
       max-width: 320px;
       text-align: center;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -62,7 +63,6 @@
       line-height: 1.1;
       letter-spacing: -2px;
       font-variant-numeric: tabular-nums;
-      user-select: none;
     }
 
     .timer-labels {
@@ -72,8 +72,7 @@
       font-size: 11px;
       color: #495057;
       margin-top: -2px;
-      margin-bottom: 16px;
-      user-select: none;
+      margin-bottom: 18px;
     }
 
     .button-group {
@@ -93,13 +92,13 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      height: 34px;
+      height: 32px;
       padding: 0 12px;
-      user-select: none;
+      transition: all 0.15s ease;
     }
 
     button:disabled {
-      opacity: 0.4;
+      opacity: 0.45;
       cursor: not-allowed;
     }
 
@@ -108,12 +107,18 @@
       color: #ffffff;
       flex: 1;
     }
+    .btn-start:hover:not(:disabled) {
+      background: #2368a5;
+    }
 
     .btn-pause {
       background: #e5b044;
       color: #3b2800;
       gap: 5px;
       flex: 1.2;
+    }
+    .btn-pause:hover:not(:disabled) {
+      background: #cca037;
     }
 
     .toggle-pill {
@@ -124,7 +129,6 @@
       border-radius: 10px;
       position: relative;
     }
-
     .toggle-circle {
       display: block;
       width: 10px;
@@ -136,7 +140,6 @@
       left: 1px;
       transition: transform 0.2s;
     }
-
     .btn-pause.active .toggle-circle {
       transform: translateX(10px);
     }
@@ -146,6 +149,9 @@
       color: #d93829;
       border: 1.2px solid #eecac6;
       flex: 1;
+    }
+    .btn-stop:hover:not(:disabled) {
+      background: #fdf2f1;
     }
 
     .log-container {
@@ -172,6 +178,9 @@
       color: #333;
       border: 1px solid #dee2e6;
     }
+    .btn-copy:hover {
+      background: #e9ecef;
+    }
   </style>
 </head>
 <body>
@@ -191,38 +200,38 @@
   </div>
 
   <div class="button-group">
-    <button type="button" id="startBtn" class="btn-start" onclick="startPomodoro()">Start</button>
-    <button type="button" id="pauseBtn" class="btn-pause" onclick="togglePause()" disabled>
+    <button id="startBtn" class="btn-start" onclick="startPomodoro()">Start</button>
+    <button id="pauseBtn" class="btn-pause" onclick="togglePause()" disabled>
       <span>Pause</span>
       <span class="toggle-pill"><span id="toggleCircle" class="toggle-circle"></span></span>
     </button>
-    <button type="button" id="stopBtn" class="btn-stop" onclick="stopPomodoro()" disabled>Stop</button>
+    <button id="stopBtn" class="btn-stop" onclick="stopPomodoro()" disabled>Stop</button>
   </div>
 
   <div id="logContainer" class="log-container">
     <div id="logBox" class="log-box"></div>
-    <button type="button" id="copyBtn" class="btn-copy" onclick="copyLog()">📋 복사하기</button>
+    <button id="copyBtn" class="btn-copy" onclick="copyLog(event)">📋 복사하기</button>
   </div>
 </div>
 
 <script>
-  var FOCUS_TIME = 25 * 60;
-  var SHORT_BREAK = 5 * 60;
-  var LONG_BREAK = 30 * 60;
+  const FOCUS_TIME = 25 * 60;
+  const SHORT_BREAK = 5 * 60;
+  const LONG_BREAK = 30 * 60;
 
-  var timerInterval = null;
-  var currentSeconds = FOCUS_TIME;
-  var isFocus = true;
-  var isPaused = false;
-  var completedFocusSessions = 0;
-  var cycleCount = 1;
-  var overallStartTime = null;
-  var generatedLog = "";
+  let timerInterval = null;
+  let currentSeconds = FOCUS_TIME;
+  let isFocus = true;
+  let isPaused = false;
+  let completedFocusSessions = 0;
+  let cycleCount = 1;
+  let overallStartTime = null;
+  let generatedLog = "";
 
   function formatDisplay(sec) {
-    var m = String(Math.floor(sec / 60)).padStart(2, '0');
-    var s = String(sec % 60).padStart(2, '0');
-    return m + ":" + s;
+    const m = String(Math.floor(sec / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    return `${m}:${s}`;
   }
 
   function formatClock(date) {
@@ -252,7 +261,7 @@
   }
 
   function togglePause() {
-    var pauseBtn = document.getElementById("pauseBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
     if (!isPaused) {
       clearInterval(timerInterval);
       isPaused = true;
@@ -265,3 +274,126 @@
   }
 
   function setPhaseUI() {
+    const badgeText = document.getElementById("badgeText");
+    const statusBadge = document.getElementById("statusBadge");
+    const cycleText = document.getElementById("cycleText");
+
+    if (isFocus) {
+      badgeText.innerText = `Deep Work (Session #${completedFocusSessions + 1})`;
+      statusBadge.style.background = "#d93829";
+      cycleText.innerText = `Cycle: ${cycleCount} / 4`;
+    } else {
+      const isLong = (cycleCount === 4);
+      badgeText.innerText = isLong ? "Long Break" : "Short Break";
+      statusBadge.style.background = "#2b7cc4";
+      cycleText.innerText = isLong ? "4 Cycle Complete!" : `Cycle: ${cycleCount} / 4`;
+    }
+  }
+
+  function runTimer() {
+    updateDisplay();
+    timerInterval = setInterval(() => {
+      currentSeconds--;
+      updateDisplay();
+
+      if (currentSeconds <= 0) {
+        clearInterval(timerInterval);
+        handlePhaseEnd();
+      }
+    }, 1000);
+  }
+
+  function handlePhaseEnd() {
+    if (isFocus) {
+      completedFocusSessions++;
+      if (cycleCount === 4) {
+        isFocus = false;
+        currentSeconds = LONG_BREAK;
+      } else {
+        isFocus = false;
+        currentSeconds = SHORT_BREAK;
+      }
+    } else {
+      if (cycleCount === 4) {
+        cycleCount = 1;
+      } else {
+        cycleCount++;
+      }
+      isFocus = true;
+      currentSeconds = FOCUS_TIME;
+    }
+
+    setPhaseUI();
+    runTimer();
+  }
+
+  function stopPomodoro() {
+    clearInterval(timerInterval);
+    const overallEndTime = new Date();
+
+    const currentPhaseTotal = isFocus ? FOCUS_TIME : (cycleCount === 4 ? LONG_BREAK : SHORT_BREAK);
+    const elapsedInCurrent = currentPhaseTotal - currentSeconds;
+    const elapsedMinutesInCurrent = Math.floor(elapsedInCurrent / 60);
+
+    let detailStr = "";
+    if (isFocus) {
+      detailStr = `${completedFocusSessions}타임 완료, ${completedFocusSessions + 1}번째 타임 ${elapsedMinutesInCurrent}분 진행 중 종료`;
+    } else {
+      detailStr = `${completedFocusSessions}타임 완료 후 휴식 중 종료`;
+    }
+
+    const startClock = formatClock(overallStartTime);
+    const endClock = formatClock(overallEndTime);
+    generatedLog = `- 🍅 [${startClock} ~ ${endClock}] (${detailStr})`;
+
+    document.getElementById("logBox").innerText = generatedLog;
+    document.getElementById("logContainer").style.display = "block";
+    document.getElementById("copyBtn").innerText = "📋 복사하기";
+
+    document.getElementById("startBtn").disabled = false;
+    document.getElementById("pauseBtn").disabled = true;
+    document.getElementById("stopBtn").disabled = true;
+    document.getElementById("pauseBtn").classList.remove("active");
+  }
+
+  function copyLog(e) {
+    if (e) e.preventDefault();
+    const copyBtn = document.getElementById("copyBtn");
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(generatedLog)
+        .then(() => {
+          copyBtn.innerText = "✓ 복사 완료!";
+          setTimeout(() => { copyBtn.innerText = "📋 복사하기"; }, 2000);
+        })
+        .catch(() => fallbackCopy());
+    } else {
+      fallbackCopy();
+    }
+  }
+
+  function fallbackCopy() {
+    const copyBtn = document.getElementById("copyBtn");
+    const textArea = document.createElement("textarea");
+    textArea.value = generatedLog;
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "1px";
+    textArea.style.height = "1px";
+    textArea.style.opacity = "0";
+    document.body.appendChild(textArea);
+    textArea.focus({ preventScroll: true });
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      copyBtn.innerText = "✓ 복사 완료!";
+      setTimeout(() => { copyBtn.innerText = "📋 복사하기"; }, 2000);
+    } catch (err) {
+      copyBtn.innerText = "⚠️ 직접 드래그해 복사하세요";
+    }
+    document.body.removeChild(textArea);
+  }
+</script>
+</body>
+</html>
