@@ -129,7 +129,7 @@
       background: #cca037;
     }
 
-    /* Pause 내부 토글 스위치 디자인 */
+    /* Pause 내부 토글 스위치 */
     .toggle-pill {
       display: inline-block;
       width: 22px;
@@ -360,7 +360,7 @@
 
     document.getElementById("logBox").innerText = generatedLog;
     document.getElementById("logContainer").style.display = "block";
-    document.getElementById("copyBtn").innerText = "📋 노션용 로그 복사";
+    document.getElementById("copyBtn").innerText = "📋 복사하기";
 
     // 상태 초기화
     document.getElementById("startBtn").disabled = false;
@@ -369,10 +369,53 @@
     document.getElementById("pauseBtn").classList.remove("active");
   }
 
+  // 노션 임베드(iframe) 환경 지원 복사 로직
   function copyLog() {
-    navigator.clipboard.writeText(generatedLog).then(() => {
-      document.getElementById("copyBtn").innerText = "✓ 복사 완료! 노션에 붙여넣으세요";
-    });
+    const copyBtn = document.getElementById("copyBtn");
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(generatedLog)
+        .then(() => {
+          showCopySuccess(copyBtn);
+        })
+        .catch(() => {
+          fallbackCopyText(generatedLog, copyBtn);
+        });
+    } else {
+      fallbackCopyText(generatedLog, copyBtn);
+    }
+  }
+
+  function fallbackCopyText(text, btnElement) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        showCopySuccess(btnElement);
+      } else {
+        btnElement.innerText = "⚠️ 드래그해서 복사해주세요";
+      }
+    } catch (err) {
+      btnElement.innerText = "⚠️ 드래그해서 복사해주세요";
+    }
+
+    document.body.removeChild(textArea);
+  }
+
+  function showCopySuccess(btnElement) {
+    btnElement.innerText = "✓ 복사 완료!";
+    setTimeout(() => {
+      btnElement.innerText = "📋 복사하기";
+    }, 2000);
   }
 </script>
 </body>
